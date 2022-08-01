@@ -1,9 +1,10 @@
 #include "include.hpp"
 
 typedef struct Block {
+public:
   char *hash, *prev_hash;
   uint64_t timestamp;
-  json transactions;
+  std::vector<json_transaction> transactions;
 };
 
 class BlockChain {

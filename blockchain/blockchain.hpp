@@ -5,15 +5,18 @@ public:
   char *hash, *prev_hash;
   uint64_t timestamp;
   std::vector<json_transaction> transactions;
+  int index;
 };
 
 class BlockChain {
+public:
   std::vector<Block> chain;
+  std::vector<json_transaction> curr_transactions;
   
   BlockChain();
   
   /**
- * @brief Appends a new transaction to the chain
+ * @brief Appends a new transaction to the block
  * 
  * @param a Wallet address of the sender
  * @param n Wallet address of the receiver

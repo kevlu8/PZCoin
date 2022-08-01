@@ -9,8 +9,8 @@ int BlockChain::new_transaction(char *a, char *b, uint64_t amount) {
   transaction.sender = a;
   transaction.receiver = b;
   transaction.amount = amount;
-  chain.back().transactions.push_back(transaction);
-  return chain.size() - 1;
+  curr_transactions.push_back(transaction);
+  return get_last_block().index + 1;
 }
 
 Block BlockChain::new_block(char *hash, char *prev_hash) {

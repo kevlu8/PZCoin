@@ -1,7 +1,8 @@
 #include "blockchain.hpp"
 
 BlockChain::BlockChain() {
-  chain.push_back(new_block("0")); // Create the genesis block
+  new_block("0");
+  first = latest;
 }
 
 int BlockChain::new_transaction(char *a, char *b, uint64_t amount) {
@@ -13,14 +14,19 @@ int BlockChain::new_transaction(char *a, char *b, uint64_t amount) {
   return get_last_block().index + 1;
 }
 
-Block BlockChain::new_block(char *hash, char *prev_hash) {
+void BlockChain::new_block(char *hash, char *prev_hash=NULL) {
   Block block;
+  block.next = NULL;
+  block.prev = latest;
+  latest->next = &block;
+  block.index = latest->index + 1;
+  latest = &block;
   block.hash = hash;
   block.prev_hash = prev_hash;
   block.timestamp = time(NULL);
-  return block;
+  block.transactions = curr_transactions; // wait for transactions to be added
 }
 
 Block BlockChain::get_last_block() {
-  return chain.back();
+  return *latest;
 }

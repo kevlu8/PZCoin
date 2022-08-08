@@ -1,16 +1,17 @@
 #include "include.hpp"
 
 typedef struct Block {
-public:
   char *hash, *prev_hash;
   uint64_t timestamp;
   std::vector<json_transaction> transactions;
   int index;
+  Block *next, *prev;
 };
 
 class BlockChain {
 public:
-  std::vector<Block> chain;
+  Block *first;
+  Block *latest;
   std::vector<json_transaction> curr_transactions;
   
   BlockChain();
@@ -26,13 +27,13 @@ public:
   int new_transaction(char *a, char *b, uint64_t amount);
 
   /**
-   * @brief Creates a new block and appends it to the chain
+   * @brief Creates a new block and appends it to the chain.
    * 
    * @param hash The hash of the block
    * @param prev_hash (Optional) The hash of the previous block
    * @return The block
    */
-  Block new_block(char *hash, char *prev_hash=NULL);
+  void new_block(char *hash, char *prev_hash=NULL);
 
   /**
    * @brief Returns the JSON data of the last block

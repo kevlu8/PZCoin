@@ -26,11 +26,12 @@ EC_point EC_point::operator+(EC_point point) {
 	mpz_submul(intercept, mpq_numref(slope), x);
 	mpz_tdiv_q(intercept, intercept, mpq_denref(slope));
 	// Calculate point of intersection
-	// Equation: x3 = m^2 - x2 - x1
+	// Equation: x3 = m^2 - A - x2 - x1
 	mpz_init_set(resx, mpq_numref(slope));
 	mpz_pow_ui(resx, resx, 2);
 	mpz_sub(resx, resx, x);
 	mpz_sub(resx, resx, point.x);
+	mpz_sub_ui(resx, resx, 486662);
 	// Calculate y value
 	mpz_init(resy);
 	mpz_addmul(resy, resx, mpq_numref(slope));
@@ -79,10 +80,11 @@ EC_point EC_point::double_point() {
 	mpz_submul(intercept, mpq_numref(slope), x);
 	mpz_tdiv_q(intercept, intercept, mpq_denref(slope));
 	// Calculate point of intersection
-	// Equation: x2 = m^2 - 2*x1
+	// Equation: x2 = m^2 - A - 2*x1
 	mpz_init_set(resx, mpq_numref(slope));
 	mpz_pow_ui(resx, resx, 2);
 	mpz_submul_ui(resx, x, 2);
+	mpz_sub_ui(resx, resx, 486662);
 	// Calculate y value
 	mpz_init_set(resy, intercept);
 	mpz_addmul(resy, mpq_numref(slope), resx);

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 
 project(PZMiner)
-set(PROJECT_VERSION 0.0.1)
+set(PROJECT_VERSION 0.2.0)
 
 set(CMAKE_CXX_STANDARD 20)
 

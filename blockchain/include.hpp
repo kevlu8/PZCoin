@@ -1,8 +1,8 @@
 #pragma once
 
-#include <vector>
-#include <stdlib.h>
 #include <cstdint>
 #include <ctime>
+#include <stdlib.h>
+#include <vector>
 
 #include "util.hpp"

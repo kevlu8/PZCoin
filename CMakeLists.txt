@@ -11,4 +11,6 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -Wextra -pedantic -Wno-comment")
 
-# add_executable(pzminer block/main.cpp)
+add_executable(pzcoin hashing/main.cpp hashing/ec.cpp)
+
+target_link_libraries(pzcoin gmp)

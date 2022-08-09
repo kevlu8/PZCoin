@@ -17,26 +17,26 @@ public:
 	BlockChain();
 
 	/**
-	 * @brief Appends a new transaction to the block
+	 * @brief Append a new transaction to the block
 	 *
 	 * @param a Wallet address of the sender
 	 * @param n Wallet address of the receiver
 	 * @param amount Amount of coins to send
 	 * @return The index of the block containing the transaction
 	 */
-	int new_transaction(char *a, char *b, uint64_t amount);
+	int new_transaction(char *, char *, uint64_t);
 
 	/**
-	 * @brief Creates a new block and appends it to the chain.
+	 * @brief Create a new block and appends it to the chain.
 	 *
 	 * @param hash The hash of the block
 	 * @param prev_hash (Optional) The hash of the previous block
 	 * @return The block
 	 */
-	void new_block(char *hash, char *prev_hash = NULL);
+	void new_block(char *, char * = NULL);
 
 	/**
-	 * @brief Returns the JSON data of the last block
+	 * @brief Return the JSON data of the last block
 	 *
 	 * @return The block
 	 */

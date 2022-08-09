@@ -1,2 +1,2 @@
 #include <cmath>
-#include <gmpxx.h>
+#include <gmp.h>

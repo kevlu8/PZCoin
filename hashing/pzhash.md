@@ -11,24 +11,25 @@
 - To get point of intersection with curve: $x_3 = m^2 + m-x_1 - x_2$ or $x_2 = m^2 + m - 2x_1$
 	- Derivation of the equations below
 
-1. Set the curve ( $y^2 = x^3 + Ax^2 + x$ ) and the tangent or secant line ( $y = mx + b$ ) equal to each other
-	1. $x^3 + Ax^2 + x = (mx + b)^2$
-	2. $x^3 + Ax^2 + x = m^2x^2 + 2mbx + b^2$
-2. Move them to the other side of the equation and combine like terms
-	1. $x^3 + Ax^2 + x - m^2x^2 - 2mbx - b^2 = 0$
-	2. $x^3 + (A - m^2)x^2 + (1 - 2mb)x - b^2 = 0$
-3. Express the points of intersection as a factored cubic equation
+1. Set the y= form of the curve ( $y = \pm \sqrt{x^3 + \frac{1}{4}x^2 + b} - \frac{1}{2}x$ ) and the tangent/secant line ( $y = mx + b$ ) equal to each other
+	1. $\pm \sqrt{x^3 + \frac{1}{4}x^2 + b} - \frac{1}{2}x = mx + b$
+2. Get rid of the square root by moving $\frac{1}{2}x$ to the other side and squaring both sides
+	1. $\pm \sqrt{x^3 + \frac{1}{4}x^2 + b} = mx + b + \frac{1}{2}x$
+	2. $x^3 + \frac{1}{4}x^2 + b = m^2x^2 + mx^2 + \frac{1}{4}x^2 + 2mbx + bx + b^2$
+3. Convert the equation into a cubic equation in =0 form by moving all terms to one side of the equals sign and combining like terms
+	1. $m^2x^2 + mx^2 + \frac{1}{4}x^2 + 2mbx + bx + b^2 - x^3 - \frac{1}{4}x^2 - b = 0$
+	2. $-x^3 + (m^2 + m)x^2 + (2mb + b)x + b^2 - b = 0$
+	3. $x^3 - (m^2 + m)x^2 - (2mb + b)x - b^2 + b = 0$
+4. Express the points of intersection as a factored cubic equation
 	1. $(x - x_1)(x - x_2)(x - x_3) = 0$
-4. Expand the equation and collect like terms
+5. Expand the equation and collect like terms
 	1. $(x - x_1)(x^2 - x_2x - x_3x + x_2x_3) = 0$
 	2. $x^3 - x_2x^2 - x_3x^2 + x_2x_3x - x_1x^2 + x_1x_2x + x_1x_3x - x_1x_2x_3 = 0$
-	3. $x^3 + (-x_1 - x_2 - x_3)x^2 + (x_1x_2 + x_1x_3 + x_2x_3)x - x_1x_2x_3 = 0$
-5. Take the coefficients of the 2nd degree on both equations and set them equal to each other
-	1. $-x_1 - x_2 - x_3 = A - m^2$
-6. Isolate $x_3$
-	1. $-x_2 - x_3 = A - m^2 + x_1$
-	2. $-x_3 = A - m^2 + x_1 + x_2$
-	3. $x_3 = m^2 - A - x_1 - x_2$
-7. For the other equation, $x_1$ and $x_2$ are equal as the two roots overlap each other
-	1. $x_3 = m^2 - A - 2x_1$
-	2. $x_2 = m^2 - A - 2x_1$
+	3. $x^3 - (x_1 + x_2 + x_3)x^2 + (x_1x_2 + x_1x_3 + x_2x_3)x - x_1x_2x_3 = 0$
+6. Take the coefficients of the 2nd degree on both equations and set them equal to each other
+	1. $x_1 + x_2 + x_3 = m^2 + m$
+7. Isolate $x_3$
+	1. $x_3 = m^2 + m - x_1 - x_2$
+8. For the other equation, there are 2 points of intersection that are the same, so we can set $x_1$ equal to $x_2$ and simplify the previous equation
+	1. $x_3 = m^2 + m - x_1 - x_1$
+	2. $x_2 = m^2 + m - 2x_1$

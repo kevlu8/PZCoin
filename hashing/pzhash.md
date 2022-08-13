@@ -1,14 +1,14 @@
 # PZHash
-- This hashing function uses 256-bit ECDSA with Curve25519 to sign a nonce using a public key included in the block
-- The public key is a randomly generated 64 bit integer that must be unique for the 1000 latest blocks
+- This hashing function uses a ECOH-512 hash
+- It hashes the concatenation of the current block and the hash of the previous block
 
 # Technical stuff
-- The equation of the curve being used will be $y^2 = x^3 + 486662x^2 + x$
-	- This will actually be expressed as $y = \pm \sqrt{x^3 + 486662x^2 + x}$
-- The derivative of this equation is $y' = \frac{3x^2 + 973324x + 1}{2\sqrt{x^3 + 486662x^2 + x}}$
-- Base point is x = 9
-- Everything is modulo $2^{255} - 19$
-- To get point of intersection with curve: $x_3 = m^2 - A - x_1 - x_2$ or $x_2 = m^2 - 2x_1$
+- The equation of the curve being used will be $y^2 + xy = x^3 + b$ where b is a very large number
+	- This will actually be expressed as $y = \pm \sqrt{x^3 + \frac{1}{4}x^2 + b} - \frac{1}{2}x$
+- The derivative of this equation is $y' = \pm \frac{3x^2 + \frac{1}{2}x}{2\sqrt{x^3 + \frac{1}{4}x^2 + b}} - \frac{1}{2}$
+- Base point is a very large number that is specified in the curve standard
+- Everything is modulo $x^{571} + x^{10} + x^{5} + x^{2} + 1$
+- To get point of intersection with curve: $x_3 = m^2 + m-x_1 - x_2$ or $x_2 = m^2 + m - 2x_1$
 	- Derivation of the equations below
 
 1. Set the curve ( $y^2 = x^3 + Ax^2 + x$ ) and the tangent or secant line ( $y = mx + b$ ) equal to each other

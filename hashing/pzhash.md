@@ -6,7 +6,8 @@
 - The equation of the curve being used will be $y^2 + xy = x^3 + B$ where B is a very large number
 	- This will actually be expressed as $y = \pm \sqrt{x^3 + \frac{1}{4}x^2 + B} - \frac{1}{2}x$
 - The derivative of this equation is $y' = \pm \frac{3x^2 + \frac{1}{2}x}{2\sqrt{x^3 + \frac{1}{4}x^2 + B}} - \frac{1}{2}$
-- The base point and B are very large constants that is specified in the [curve standard](https://neuromancer.sk/std/nist/B-571)
+	- This will actually be expressed as $y' = \pm \frac{6x^2 + x}{2\sqrt{4x^3 + x^2 + 4B}} - \frac{1}{2}$
+- The base point and B are very large integer constants that is specified in the [curve standard](https://neuromancer.sk/std/nist/B-571)
 - Everything is modulo $x^{571} + x^{10} + x^{5} + x^{2} + 1$
 - To get point of intersection with curve: $x_3 = m^2 + m-x_1 - x_2$ or $x_2 = m^2 + m - 2x_1$
 	- Derivation of the equations below

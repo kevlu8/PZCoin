@@ -1,110 +1,148 @@
 #include "ec.hpp"
 
-EC_point::EC_point() { mpz_inits(x, y, NULL); }
-
-EC_point::EC_point(const mpz_t x, const mpz_t y) {
-	mpz_init_set(this->x, x);
-	mpz_init_set(this->y, y);
+void calc_y(const mpz_t x, mpq_t y) {
+	mpq_t temp;
+	mpq_init(temp);
+	// y = x^3 / 1
+	mpz_pow_ui(mpq_numref(y), x, 3);
+	// temp = x^2 / 4
+	mpz_pow_ui(mpq_numref(temp), x, 2);
+	mpz_set_ui(mpq_denref(temp), 4);
+	// y = x^3 + x^2 / 4
+	mpq_add(y, y, temp);
+	// y = x^3 + x^2 / 4 + B
+	mpz_addmul_ui(mpq_numref(y), mpq_denref(y), B);
+	// y = sqrt(x^3 + x^2 / 4 + B)
+	mpq_set_d(y, sqrt(mpq_get_d(y)));
+	mpz_set_ui(mpq_denref(temp), 2);
+	mpq_sub(y, y, temp);
+	mpq_canonicalize(y);
+	mpq_clear(temp);
 }
 
-EC_point::EC_point(const int x, const int y) {
-	mpz_init_set_si(this->x, x);
-	mpz_init_set_si(this->y, y);
+void calc_y(const mpq_t x, mpq_t y) {
+	mpq_t temp;
+	mpq_init(temp);
+	// y = x^3
+	mpz_pow_ui(mpq_numref(y), mpq_numref(x), 3);
+	mpz_pow_ui(mpq_denref(y), mpq_denref(x), 3);
+	// temp = x^2 / 4
+	mpz_pow_ui(mpq_numref(temp), mpq_numref(x), 2);
+	mpz_pow_ui(mpq_denref(temp), mpq_denref(x), 2);
+	mpz_mul_ui(mpq_denref(temp), mpq_denref(temp), 4);
+	// y = x^3 + x^2 / 4
+	mpq_add(y, y, temp);
+	// y = x^3 + x^2 / 4 + B
+	mpz_addmul_ui(mpq_numref(y), mpq_denref(y), B);
+	// y = sqrt(x^3 + x^2 / 4 + B)
+	mpq_set_d(y, sqrt(mpq_get_d(y)));
+	mpz_set_ui(mpq_denref(temp), 2);
+	mpq_sub(y, y, temp);
+	mpq_canonicalize(y);
+	mpq_clear(temp);
 }
 
 EC_point::EC_point(const mpz_t x) {
 	mpz_init_set(this->x, x);
-	mpz_t temp;
-	mpz_inits(this->y, temp, NULL);
-	mpz_pow_ui(this->y, x, 3);
-	mpz_pow_ui(temp, x, 2);
-	mpz_addmul_ui(this->y, temp, A);
-	mpz_add(this->y, this->y, this->x);
-	mpz_sqrt(this->y, this->y);
-	mpz_clear(temp);
+	mpq_init(y);
+	calc_y(this->x, y);
 }
 
 EC_point::EC_point(const int x) {
 	mpz_init_set_si(this->x, x);
-	mpz_t temp;
-	mpz_inits(this->y, temp, NULL);
-	mpz_pow_ui(this->y, this->x, 3);
-	mpz_pow_ui(temp, this->x, 2);
-	mpz_addmul_ui(this->y, temp, A);
-	mpz_add(this->y, this->y, this->x);
-	mpz_sqrt(this->y, this->y);
-	mpz_clear(temp);
+	mpq_init(y);
+	calc_y(this->x, y);
+}
+
+EC_point::EC_point(const mpz_t x, const bool neg) {
+	mpz_init_set(this->x, x);
+	mpq_init(y);
+	calc_y(this->x, y);
+	if (neg)
+		mpq_neg(y, y);
+}
+
+EC_point::EC_point(const int x, const bool neg) {
+	mpz_init_set_si(this->x, x);
+	mpq_init(y);
+	calc_y(this->x, y);
+	if (neg)
+		mpq_neg(y, y);
 }
 
 EC_point::~EC_point() {
-	// mpz_clears(x, y, NULL);
+	// mpz_clear(x);
+	// mpq_clear(y);
+}
+
+EC_point::EC_point(const mpz_t x, const mpq_t y) {
+	mpz_init_set(this->x, x);
+	mpq_init(this->y);
+	mpq_set(this->y, y);
 }
 
 EC_point EC_point::operator+(EC_point point) {
-	if (mpz_cmp(this->x, point.x) < 0) {
+	// For some reason if this isn't here the program crashes
+	if (mpz_cmp(x, point.x) < 0) {
 		return point + *this;
 	}
-	if (mpz_cmp(this->x, point.x) + mpz_cmp(this->y, point.y) == 0) {
+	// If the points are the same, return the double of the point
+	if (mpz_cmp(x, point.x) + mpq_cmp(y, point.y) == 0) {
 		return this->double_point();
 	}
-	mpq_t slope, temp2, intercept, accy1, accy2;
-	mpz_t temp, resx, resy;
-	mpq_inits(slope, temp2, intercept, accy1, accy2, NULL);
-	mpz_inits(temp, resx, resy, NULL);
-	// Calculate y values with more precision
-	mpz_pow_ui(mpq_numref(accy1), this->x, 3);
-	mpz_set_ui(mpq_denref(accy1), 1);
-	mpz_pow_ui(temp, this->x, 2);
-	mpz_addmul_ui(mpq_numref(accy1), temp, A);
-	mpz_add(mpq_numref(accy1), mpq_numref(accy1), this->x);
-	mpq_set_d(accy1, sqrt(mpq_get_d(accy1)));
-	if (mpz_cmp_si(this->y, 0) < 0)
-		mpq_neg(accy1, accy1);
-	mpz_pow_ui(mpq_numref(accy2), point.x, 3);
-	mpz_set_ui(mpq_denref(accy2), 1);
-	mpz_pow_ui(temp, point.x, 2);
-	mpz_addmul_ui(mpq_numref(accy2), temp, A);
-	mpz_add(mpq_numref(accy2), mpq_numref(accy2), point.x);
-	mpq_set_d(accy2, sqrt(mpq_get_d(accy2)));
-	if (mpz_cmp_si(point.y, 0) < 0)
-		mpq_neg(accy2, accy2);
-	// Calculate the numerator of the slope
-	mpq_sub(slope, accy1, accy2);
-	// Calculate the denominator of the slope
-	mpz_sub(temp, this->x, point.x);
-	mpz_mul(mpq_denref(slope), mpq_denref(slope), temp);
-	// Calculate intercept (b of mx + b)
+	mpq_t slope, intercept, temp, resy;
+	mpz_t resx;
+	mpq_inits(slope, intercept, temp, resy, NULL);
+	mpz_init(resx);
+	// slope = (y2 - y1) / 1
+	mpq_sub(slope, y, point.y);
+	// temp = (x2 - x1) / 1
+	mpz_sub(mpq_numref(temp), x, point.x);
+	// slope = (y2 - y1) / (x2 - x1)
+	mpq_div(slope, slope, temp);
 	mpq_canonicalize(slope);
-	mpz_mul(mpq_numref(intercept), mpq_numref(slope), x);
-	mpz_set(mpq_denref(intercept), mpq_denref(slope));
-	mpq_neg(intercept, intercept);
-	mpq_add(intercept, intercept, accy1);
+	// intercept = y1 - slope * x1
+	mpz_set(mpq_denref(temp), mpq_denref(slope));
+	mpz_mul(mpq_numref(temp), mpq_numref(slope), x);
+	mpq_sub(intercept, y, temp);
 	mpq_canonicalize(intercept);
-	// Calculate point of intersection
-	// Equation: x3 = m^2 - A - x2 - x1
-	mpz_pow_ui(mpq_numref(temp2), mpq_numref(slope), 2);
-	mpz_pow_ui(mpq_denref(temp2), mpq_denref(slope), 2);
-	mpz_submul_ui(mpq_numref(temp2), mpq_denref(temp2), A);
-	mpz_submul(mpq_numref(temp2), mpq_denref(temp2), this->x);
-	mpz_submul(mpq_numref(temp2), mpq_denref(temp2), point.x);
-	mpz_set_q(resx, temp2);
-	// Calculate y value
-	mpq_mul(slope, slope, temp2);
-	mpq_add(slope, slope, intercept);
-	mpz_set_q(resy, slope);
-	mpz_neg(resy, resy);
-	EC_point result = EC_point(resx, resy);
-	// Clear memory
-	mpz_clears(temp, resx, resy, NULL);
-	mpq_clears(slope, temp2, intercept, NULL);
+	// temp = m^2
+	mpz_pow_ui(mpq_numref(temp), mpq_numref(slope), 2);
+	mpz_pow_ui(mpq_denref(temp), mpq_denref(slope), 2);
+	// temp = m^2 + m
+	mpq_add(temp, temp, slope);
+	// temp = m^2 + m - x1
+	mpz_submul(mpq_numref(temp), x, mpq_denref(temp));
+	// temp = m^2 + m - x1 - x2
+	mpz_submul(mpq_numref(temp), point.x, mpq_denref(temp));
+	// Calculate the y coordinate of the point
+	calc_y(temp, resy);
+	// Debug print
+	std::cout << "plus: " << mpq_get_str(NULL, 10, temp) << ' ' << mpq_get_str(NULL, 10, resy) << std::endl;
+	// Create the point
+	mpz_set_q(resx, temp);
+	EC_point result(resx, resy);
+	// Clean up
+	mpq_clears(slope, intercept, temp, resy, NULL);
+	mpz_clear(resx);
 	return result;
 }
 
-void EC_point::operator+=(EC_point point) { *this = *this + point; }
+void EC_point::operator+=(EC_point point) {
+	EC_point result = *this + point;
+	mpz_set(x, result.x);
+	mpq_set(y, result.y);
+}
 
 EC_point EC_point::operator*(mpz_t n) {
-	// Implement the double-and-add algorithm
-	EC_point result = EC_point(x, y);
+	if (mpz_cmp_si(n, 0) == 0) {
+		return EC_point(0);
+	}
+	if (mpz_cmp_si(n, 1) == 0) {
+		return *this;
+	}
+	// Implement the double-and-add algorithm (based on square-multiply algorithm)
+	EC_point result = EC_point(x, mpq_cmp(y, 0) < 0);
 	for (int i = mpz_sizeinbase(n, 2) - 2; i >= 0; i--) {
 		result = result.double_point();
 		if (mpz_tstbit(n, i)) {
@@ -115,54 +153,66 @@ EC_point EC_point::operator*(mpz_t n) {
 }
 
 EC_point EC_point::double_point() {
-	mpq_t slope, temp2, intercept;
-	mpz_t temp, resx, resy;
-	// Calculate the numerator of the slope using the formula (derivative of elliptic curve)
-	mpq_inits(slope, temp2, intercept, NULL);
-	mpz_inits(temp, resx, resy, NULL);
+	mpq_t slope, intercept, temp, resy;
+	mpz_t resx;
+	mpq_inits(slope, intercept, temp, resy, NULL);
+	mpz_init(resx);
+	// slope = x^2
 	mpz_pow_ui(mpq_numref(slope), x, 2);
-	mpz_mul_ui(mpq_numref(slope), mpq_numref(slope), 3);
-	mpz_addmul_ui(mpq_numref(slope), x, 2 * A);
-	mpz_add_ui(mpq_numref(slope), mpq_numref(slope), 1);
-	// Calculate the denominator of the slope using the formula (derivative of elliptic curve)
-	mpz_pow_ui(mpq_denref(slope), x, 3);
-	mpz_pow_ui(temp, x, 2);
-	mpz_addmul_ui(mpq_denref(slope), temp, A);
-	mpz_add(mpq_denref(slope), mpq_denref(slope), x);
-	mpq_set_d(temp2, sqrt(mpz_get_d(mpq_denref(slope))));
-	mpz_set_ui(mpq_denref(slope), 2);
-	mpz_mul(mpq_denref(slope), mpq_denref(slope), mpq_numref(temp2));
-	mpz_mul(mpq_numref(slope), mpq_numref(slope), mpq_denref(temp2));
-	// Calculate intercept (b of mx + b)
-	mpz_mul(mpq_numref(intercept), mpq_numref(slope), x);
-	mpz_set(mpq_denref(intercept), mpq_denref(slope));
-	mpq_neg(intercept, intercept);
-	mpz_pow_ui(mpq_numref(temp2), x, 3);
-	mpz_set_ui(mpq_denref(temp2), 1);
-	mpz_pow_ui(temp, x, 2);
-	mpz_addmul_ui(mpq_numref(temp2), temp, A);
-	mpz_add(mpq_numref(temp2), mpq_numref(temp2), x);
-	mpq_set_d(temp2, sqrt(mpq_get_d(temp2)));
-	if (mpz_cmp_si(y, 0) < 0)
-		mpq_neg(temp2, temp2);
-	mpq_add(intercept, intercept, temp2);
-	// Calculate point of intersection
-	// Equation: x2 = m^2 - A - 2*x1
-	mpz_pow_ui(mpq_numref(temp2), mpq_numref(slope), 2);
-	mpz_pow_ui(mpq_denref(temp2), mpq_denref(slope), 2);
-	mpz_submul_ui(mpq_numref(temp2), mpq_denref(temp2), A);
-	mpz_submul(mpq_numref(temp2), mpq_denref(temp2), x);
-	mpz_submul(mpq_numref(temp2), mpq_denref(temp2), x);
-	mpz_set_q(resx, temp2);
-	// Calculate y value
-	mpq_mul(slope, slope, temp2);
-	mpq_add(slope, slope, intercept);
-	mpz_set_q(resy, slope);
-	mpz_neg(resy, resy);
-	EC_point result = EC_point(resx, resy);
-	// Clear memory
-	mpz_clears(temp, resx, resy, NULL);
-	mpq_clears(slope, temp2, intercept, NULL);
+	// slope = 6x^2
+	mpz_mul_ui(mpq_numref(slope), mpq_numref(slope), 6);
+	// slope = 6x^2 + x
+	mpz_add(mpq_numref(slope), mpq_numref(slope), x);
+	// temp = x^3
+	mpz_pow_ui(mpq_numref(temp), x, 3);
+	// temp = x^3 + B
+	mpz_add_ui(mpq_numref(temp), mpq_numref(temp), B);
+	// temp = 4x^3 + 4B
+	mpz_mul_ui(mpq_numref(temp), mpq_numref(temp), 4);
+	// save value of temp in denominator of slope
+	mpz_set(mpq_denref(slope), mpq_numref(temp));
+	// temp = x^2
+	mpz_pow_ui(mpq_numref(temp), x, 2);
+	// retrieve stored value of temp in denominator of slope
+	mpz_set(mpq_numref(temp), mpq_denref(slope));
+	// temp = sqrt(4x^3 + x^2 + 4B)
+	mpq_set_d(temp, sqrt(mpq_get_d(temp)));
+	// temp = sqrt(4x^3 + x^2 + 4B) * 2
+	mpz_mul_ui(mpq_numref(temp), mpq_numref(temp), 2);
+	// temp = 1/(2sqrt(4x^3 + x^2 + 4B))
+	mpq_inv(temp, temp);
+	// slope = (6x^2 + x)/(2sqrt(4x^3 + x^2 + 4B))
+	mpq_mul(slope, slope, temp);
+	// temp = 1/2
+	mpz_set_ui(mpq_numref(temp), 1);
+	mpz_set_ui(mpq_denref(temp), 2);
+	// slope = (6x^2 + x)/(2sqrt(4x^3 + x^2 + 4B)) - 1/2
+	mpq_sub(slope, slope, temp);
+	mpq_canonicalize(slope);
+	// intercept = y1 - slope * x1
+	mpz_set(mpq_denref(temp), mpq_denref(slope));
+	mpz_mul(mpq_numref(temp), mpq_numref(slope), x);
+	mpq_sub(intercept, y, temp);
+	mpq_canonicalize(intercept);
+	// temp = m^2
+	mpz_pow_ui(mpq_numref(temp), mpq_numref(slope), 2);
+	mpz_pow_ui(mpq_denref(temp), mpq_denref(slope), 2);
+	// temp = m^2 + m
+	mpq_add(temp, temp, slope);
+	// temp = m^2 + m - x1
+	mpz_submul(mpq_numref(temp), x, mpq_denref(temp));
+	// temp = m^2 + m - 2x1
+	mpz_submul(mpq_numref(temp), x, mpq_denref(temp));
+	// Calculate the y coordinate of the point
+	calc_y(temp, resy);
+	// Debug print
+	std::cout << "double: " << mpq_get_str(NULL, 10, temp) << ' ' << mpq_get_str(NULL, 10, resy) << std::endl;
+	// Create the point
+	mpz_set_q(resx, temp);
+	EC_point result(resx, resy);
+	// Clean up
+	mpq_clears(slope, intercept, temp, resy, NULL);
+	mpz_clear(resx);
 	return result;
 }
 

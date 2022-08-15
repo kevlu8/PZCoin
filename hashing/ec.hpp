@@ -1,15 +1,17 @@
 #include "include.hpp"
 
-#define A 8
+#define B 8
 
 class EC_point {
 public:
-	mpz_t x, y;
+	mpz_t x;
+	mpq_t y;
 	EC_point();
-	EC_point(const mpz_t, const mpz_t);
-	EC_point(const int, const int);
 	EC_point(const mpz_t);
 	EC_point(const int);
+	EC_point(const mpz_t, const bool);
+	EC_point(const int, const bool);
+	EC_point(const mpz_t, const mpq_t);
 	~EC_point();
 	EC_point operator+(EC_point);
 	void operator+=(EC_point);

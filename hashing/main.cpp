@@ -1,12 +1,8 @@
 #include "ec.hpp"
-#include <iostream>
 
 int main() {
-    EC_point a(-7);
-    EC_point b(-5);
-    EC_point c = a + b;
-    mpz_out_str(stdout, 10, c.x);
-    std::cout << std::endl;
-    mpz_out_str(stdout, 10, c.y);
-    std::cout << std::endl;
+	EC_point a(-2);
+	EC_point b(1);
+	EC_point c = a + b;
+	std::cout << "main: " << mpz_out_str(NULL, 10, c.x) << ' ' << mpq_out_str(NULL, 10, c.y) << std::endl;
 }

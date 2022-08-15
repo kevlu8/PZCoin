@@ -1,6 +1,6 @@
 #include "include.hpp"
 
-#define B 8
+#define B 8U
 
 class EC_point {
 public:

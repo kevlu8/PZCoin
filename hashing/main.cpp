@@ -4,7 +4,7 @@ int main() {
 	double ax, bx;
 	std::cout << "Enter x coordinate of point A: ";
 	std::cin >> ax;
-	std::cout << "Enter y coordinate of point B: ";
+	std::cout << "Enter x coordinate of point B: ";
 	std::cin >> bx;
 	EC_point a(ax);
 	EC_point b(bx);

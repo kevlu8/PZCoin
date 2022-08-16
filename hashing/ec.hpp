@@ -22,6 +22,12 @@ public:
 	 * @return Result of the doubling
 	 */
 	EC_point double_point();
+	/**
+	 * @brief Print the point to the given output stream
+	 *
+	 * @param out Output stream to print to
+	 */
+	char *print_point(FILE *);
 };
 
 /**

@@ -216,4 +216,16 @@ EC_point EC_point::double_point() {
 	return result;
 }
 
+char *EC_point::print_point(FILE *out) {
+	if (out != NULL) {
+		fprintf(out, "(%f, %f)\n", mpq_get_d(this->x), mpq_get_d(this->y));
+		return NULL;
+	} else {
+		char *buf = (char *)malloc(sizeof(char) * 100);
+		sprintf(buf, "(%f, %f)\n", mpq_get_d(this->x), mpq_get_d(this->y));
+		buf = (char *)realloc(buf, strlen(buf) + 1);
+		return buf;
+	}
+}
+
 std::string hash(std::string message, std::string key) { return NULL; }

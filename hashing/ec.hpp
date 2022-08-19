@@ -1,20 +1,22 @@
 #include "include.hpp"
 
-#define B 8U
+// Must be called before any other function.
+void EC_init();
 
 class EC_point {
 public:
-	mpq_t x;
-	mpq_t y;
+	bool identity;
+	mpz_t x;
+	mpz_t y;
 	EC_point();
-	EC_point(const mpq_t);
+	EC_point(const mpz_t);
 	EC_point(const double);
-	EC_point(const mpq_t, const bool);
+	EC_point(const mpz_t, const bool);
 	EC_point(const double, const bool);
-	EC_point(const mpq_t, const mpq_t);
-	~EC_point();
+	EC_point(const mpz_t, const mpz_t);
 	EC_point operator+(EC_point);
 	void operator+=(EC_point);
+	void operator-();
 	EC_point operator*(mpz_t);
 	/**
 	 * @brief Double a point on an elliptic curve
@@ -28,6 +30,13 @@ public:
 	 * @param out Output stream to print to
 	 */
 	char *print_point(FILE *);
+	/**
+	 * @brief Print the point to the given output stream
+	 *
+	 * @param out Output stream to print to
+	 * @param base Base to print in
+	 */
+	char *print_point(FILE *, int);
 };
 
 /**
@@ -37,4 +46,4 @@ public:
  * @param key Key to hash with
  * @return Hash of the message
  */
-std::string hash(std::string, std::string);
+// std::string hash(std::string, std::string);

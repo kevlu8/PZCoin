@@ -1,12 +1,14 @@
 #include "ec.hpp"
-#include <iostream>
 
 int main() {
-    EC_point a(-7);
-    EC_point b(-5);
-    EC_point c = a + b;
-    mpz_out_str(stdout, 10, c.x);
-    std::cout << std::endl;
-    mpz_out_str(stdout, 10, c.y);
-    std::cout << std::endl;
+	std::string ax;
+	std::cout << "Enter x coordinate of point A: ";
+	std::cin >> ax;
+	EC_init();
+	mpz_t aval;
+	mpz_init_set_str(aval, ax.c_str(), 0);
+	EC_point a = EC_point(aval, true);
+	std::cout << "a: " << a.print_point(NULL, 16) << std::endl;
+	a = EC_point(aval, true);
+	std::cout << "a: " << a.print_point(NULL, 16) << std::endl;
 }

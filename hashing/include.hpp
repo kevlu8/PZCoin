@@ -1,3 +1,5 @@
 #include <cmath>
 #include <gmp.h>
-#include <string>
+#include <iostream>
+#include <string.h>
+#include <tuple>

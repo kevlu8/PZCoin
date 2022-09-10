@@ -38,12 +38,3 @@ public:
 	 */
 	char *print_point(FILE *, int);
 };
-
-/**
- * @brief Hash the message with the given key
- *
- * @param message Message to hash
- * @param key Key to hash with
- * @return Hash of the message
- */
-// std::string hash(std::string, std::string);

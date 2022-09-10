@@ -1,4 +1,5 @@
 #include "ec.hpp"
+#include "ecoh.hpp"
 
 mpz_t B, p, A;
 
@@ -306,5 +307,3 @@ char *EC_point::print_point(FILE *out, int base) {
 		return result;
 	}
 }
-
-// std::string hash(std::string message, std::string key) { return NULL; }

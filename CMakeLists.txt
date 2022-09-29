@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 
 project(PZMiner)
-set(PROJECT_VERSION 0.3.1)
+set(PROJECT_VERSION 0.3.2)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -15,6 +15,8 @@ add_library(ec SHARED hashing/ec.cpp)
 
 add_library(ecoh SHARED hashing/ecoh.cpp)
 
+add_library(gf SHARED hashing/gf.cpp)
+
 add_executable(pzcoin hashing/main.cpp)
 
 target_link_libraries(pzcoin gmp)
@@ -22,3 +24,5 @@ target_link_libraries(pzcoin gmp)
 target_link_libraries(ecoh ec)
 
 target_link_libraries(pzcoin ecoh)
+
+target_link_libraries(pzcoin gf)
